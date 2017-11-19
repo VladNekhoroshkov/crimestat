@@ -1,0 +1,110 @@
+import matplotlib.pyplot as plt
+import numpy as np
+Info = [];Year = [];Region = [];Section = [];Sex = [];All = []; Temp = 0
+crime = open("C:\\Users\pc\Desktop\crimestat.csv", 'r', encoding="utf-8")
+for line in crime:
+    Info.append(line.strip().split(","))
+for i in range(1, len(Info)):
+    if Info[i][0] not in Region: Region.append(Info[i][0])
+    if Info[i][1] not in Year: Year.append(Info[i][1])
+    if Info[i][2] not in Section: Section.append(Info[i][2])
+    if Info[i][4] not in Sex: Sex.append(Info[i][4])
+Category = [[]]*(len(Section)+1)*1
+
+def Add_Category(I, S, C):
+    for k in range(len(S)):
+        for j in range(len(I)):
+            if S[k] == I[j][2] and I[j][3] not in C[k]:
+                C[k].append((I[j][3]))
+            C[k+1] = []
+    return C
+Add_Category(Info, Section, Category)
+
+Year.reverse()
+IR = input("Введите регион")
+IY = input("Введите год")
+
+def Pictures(IR, I, Y, S, C):
+    LSm,LSf = [0]*len(Category[0]), [0]*len(Category[0])  # Локальный возраст
+    LEm,LEf = [0]*len(Category[1]), [0]*len(Category[1])  # Локальное образование
+    LSCm, LSCf = [0] * len(Category[2]), [0] * len(Category[2])  # Локальный соц. состав
+    LBSm, LBSf = [0] * len(Category[3]), [0] * len(Category[3])   # Локальное гражданство
+
+    for h in range(len(I)):
+        if I[h][0] == IR and I[h][2] == "по возрасту" and I[h][1] == Y:
+            for x in range(len(Category[0])):
+                if I[h][3] == Category[0][x] and I[h][4] == 'm':
+                    LSm[x] += int(I[h][5])
+                elif I[h][3] == Category[0][x] and I[h][4] == 'f':
+                    LSf[x] -=  int(I[h][5])
+
+        if I[h][0] == IR and I[h][2] == "по образованию" and I[h][1] == Y:
+            for z in range(len(Category[1])):
+                if I[h][3] == Category[1][z] and I[h][4] == 'm':
+                    LEm[z] += int(I[h][5])
+                elif I[h][3] == Category[1][z] and I[h][4] == 'f':
+                    LEf[z] -=  int(I[h][5])
+
+        if I[h][0] == IR and I[h][2] == "по социальному составу" and I[h][1] == Y:
+            for c in range(len(Category[2])):
+                if I[h][3] == Category[2][c] and I[h][4] == 'm':
+                    LSCm[c] += int(I[h][5])
+                elif I[h][3] == Category[2][c] and I[h][4] == 'f':
+                    LSCf[c] -=  int(I[h][5])
+
+        if I[h][0] == IR and I[h][2] == "по принадлежности к гражданству" and I[h][1] == Y:
+            for v in range(len(Category[3])):
+                if I[h][3] == Category[3][v] and I[h][4] == 'm':
+                    LBSm[v] += int(I[h][5])
+                elif I[h][3] == Category[3][v] and I[h][4] == 'f':
+                    LBSf[v] -=  int(I[h][5])
+
+    plt.figure(IR + " : " + IY)
+    plt.subplot(3, 3, 1)
+    plt.title("По возрасту")
+    xdata = Category[0]
+    ydata = LSm
+    plt.label = ['Men', 'Women']
+    Xdata = Category[0]
+    Ydata = LSf
+    plt.barh(xdata, ydata, alpha=0.7, color=['indigo'])
+    plt.barh(Xdata, Ydata, alpha=0.7, color=['deeppink'])
+    plt.legend(['Men', 'Women'])
+
+    plt.subplot(3, 3, 3)
+    plt.title("По социальному составу")
+    xdata = Category[2]
+    ydata = LSCm
+    plt.label = ['Men', 'Women']
+    Xdata = Category[2]
+    Ydata = LSCf
+    plt.barh(xdata, ydata, alpha=0.7, color=['indigo'])
+    plt.barh(Xdata, Ydata, alpha=0.7, color=['deeppink'])
+    plt.legend(['Men', 'Women'])
+
+    plt.subplot(3,3,7)
+    plt.title("По образованию")
+    xdata = Category[1]
+    ydata = LEm
+    plt.label = ['Men', 'Women']
+    Xdata = Category[1]
+    Ydata = LEf
+    plt.barh(xdata, ydata, alpha=0.7, color=['indigo'])
+    plt.barh(Xdata, Ydata, alpha=0.7, color=['deeppink'])
+    plt.legend(['Men', 'Women'])
+
+    plt.subplot(3, 3, 9)
+    plt.title("По принадлежности к гражданству")
+    xdata = Category[3]
+    ydata = LBSm
+    plt.label = ['Men', 'Women']
+    Xdata = Category[3]
+    Ydata = LBSf
+    plt.barh(xdata, ydata, alpha=0.7, color=['indigo'])
+    plt.barh(Xdata, Ydata, alpha=0.7, color=['deeppink'])
+    plt.legend(['Men', 'Women'])
+
+    plt.show()
+    return
+
+Pictures(IR, Info, IY, Section, Category)
